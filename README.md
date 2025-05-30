@@ -17,6 +17,8 @@ ESP-Hi 是一款基于 ESP32-C3 的 **超低成本 AI 对话机器狗**。通过
 
 ## 软件资源
 
+视频中演示的工程已合入 [xiaozhi-esp32](https://github.com/78/xiaozhi-esp32) 仓库
+
 目前已开放部分代码例程，请参考 [example 文件夹](example)，后续会持续升级更新
 
 ## 3D 结构设计

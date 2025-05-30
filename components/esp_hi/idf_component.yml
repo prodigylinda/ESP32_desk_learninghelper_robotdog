@@ -1,0 +1,33 @@
+version: "0.1.0"
+description: Board Support Package (BSP) for ESP-Hi
+
+targets:
+  - esp32c3
+
+tags:
+  - bsp
+
+dependencies:
+  idf: ">=5.0.0"
+
+  led_strip:
+    version: "^2"
+    public: true
+
+  espressif/esp_lvgl_port:
+    public: true
+    version: "^2"
+
+  esp_lcd_ili9341:
+    version: "^1"
+    public: true
+
+  button:
+    public: true
+    version: "^4"
+
+  espressif/esp_codec_dev:
+    override_path: "../espressif__esp_codec_dev"
+
+  espressif/adc_mic:
+    override_path: "../espressif__adc_mic"

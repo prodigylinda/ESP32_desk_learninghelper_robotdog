@@ -1,0 +1,556 @@
+<!--
+SPDX-FileCopyrightText: 2025 Espressif Systems (Shanghai) CO LTD
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no">
+  <title>ESP-Hi</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      position: fixed;
+      width: 100%;
+      -webkit-text-size-adjust: 100%;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid #ccc;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: white;
+      z-index: 1000;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 1rem;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .tab.active {
+      border-bottom: 2px solid #007bff;
+      color: #007bff;
+    }
+
+    .content {
+      padding: 1rem;
+      margin-top: 60px;
+      height: calc(100vh - 60px);
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* 控制 Tab */
+    .controls {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: calc(100vh - 60px);
+      position: relative;
+    }
+
+    .joystick-container {
+      width: 85vw;
+      height: 85vh;
+      border: 2px dashed #ccc;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    .joystick-hint {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+
+    .buttons-container {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      z-index: 1;
+    }
+
+    .buttons-container .button-container {
+      display: flex;
+      flex-direction: row;
+      gap: 8px;
+    }
+
+    .buttons-container .button-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .buttons-container button {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      background: #fff;
+      cursor: pointer;
+    }
+
+    @media screen and (max-width: 900px) {
+      .buttons-container .button-container {
+        flex-direction: column;
+      }
+      .buttons-container .button-row {
+        justify-content: center;
+      }
+      .buttons-container button {
+        flex: 0 0 calc(25% - 8px);
+        min-width: 45px;
+      }
+    }
+
+    .buttons-container button:hover {
+      background: #f0f0f0;
+    }
+
+    .error {
+      color: red;
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    /* 校准 Tab */
+    .config-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .vehicle {
+      position: relative;
+      width: 200px;
+      height: 300px;
+      background: #eee;
+      border-radius: 20px;
+      margin: 20px;
+    }
+
+    .servo {
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      background: #ddd;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .servo.active {
+      background: #007bff;
+      color: #fff;
+    }
+
+    .servo.fl {
+      left: -30px;
+      top: 30px;
+    }
+
+    .servo.bl {
+      left: -30px;
+      bottom: 20px;
+    }
+
+    .servo.fr {
+      right: -30px;
+      top: 30px;
+    }
+
+    .servo.br {
+      right: -30px;
+      bottom: 20px;
+    }
+
+    .header {
+      position: absolute;
+      top: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      height: 30px;
+      width: 160px;
+      background: #ddd;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .controls-buttons {
+      margin-top: 20px;
+    }
+
+    .controls-buttons button {
+      margin: 0 10px;
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      background: #ddd;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .controls-buttons button:hover {
+      background: #ccc;
+    }
+
+    .adjust {
+      margin: 10px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .adjust button {
+      margin: 0;
+      padding: 0.8rem 1.5rem;
+      font-size: 1.2rem;
+      background: #ddd;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      min-width: 50px;
+    }
+
+    .adjust button:hover {
+      background: #ccc;
+    }
+
+    #value-display {
+      font-size: 1.2rem;
+      min-width: 60px;
+      text-align: center;
+    }
+
+    .calibration-button {
+      padding: 0.8rem 1.5rem;
+      font-size: 1.2rem;
+      background: #ddd;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin: 10px;
+    }
+
+    .calibration-button:hover {
+      background: #ccc;
+    }
+
+    .calibration-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 20px;
+      margin-bottom: 5rem;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="tabs">
+    <div class="tab active" data-tab="control">控制</div>
+    <div class="tab" data-tab="config">舵机校准</div>
+  </div>
+  <div class="content">
+    <div id="control" class="panel">
+      <div class="controls">
+        <div class="buttons-container" id="action-buttons"><span>预置动作</span></div>
+        <div class="joystick-container" id="joystick">
+          <div class="joystick-hint">试试按住这里并拖动</div>
+          <div class="joystick-hint error" id="control-error"></div>
+        </div>
+      </div>
+    </div>
+    <div id="config" class="panel" style="display:none;">
+      <div class="config-area">
+        <div id="calibration-intro">
+          <h2>舵机校准说明</h2>
+          <p>ESP-Hi 组装完成后，舵机的基准位置可能不在同一平面上，这种状态下 ESP-Hi 常常无法正常运动，需要校准。</p>
+          <p>校准步骤：</p>
+          <ol>
+            <li>点击"进入舵机校准模式"，ESP-Hi 会尝试将四条腿放平。</li>
+            <li>点击屏幕上的四个舵机按钮微调四个舵机的角度，直到四条腿都与身体在同一条直线上。如果发现无法调平，请拧下腿与舵机间的螺丝，调整角度后拧回。</li>
+            <li>点击"退出校准模式"按钮，ESP-Hi 会退出校准模式。</li>
+          </ol>
+          <img src="calibration.png" alt="calibration" style="width: 100%;" />
+          <p>不要徒手掰动舵机，否则可能会损坏舵机！</p>
+          <div class="calibration-buttons">
+            <button id="start-calibration" class="calibration-button">进入舵机校准模式</button>
+          </div>
+        </div>
+        <div id="calibration-interface" style="display:none;">
+          <div class="vehicle">
+            <div class="servo fl" data-pos="fl"><span class="label">前左</span><span class="value">0</span></div>
+            <div class="servo fr" data-pos="fr"><span class="label">前右</span><span class="value">0</span></div>
+            <div class="servo bl" data-pos="bl"><span class="label">后左</span><span class="value">0</span></div>
+            <div class="servo br" data-pos="br"><span class="label">后右</span><span class="value">0</span></div>
+            <div class="header"> ESP-Hi </div>
+          </div>
+          <div class="adjust">
+            <button id="minus">-</button>
+            <code id="value-display">0</code>
+            <button id="plus">+</button>
+          </div>
+          <div class="calibration-buttons">
+            <button id="exit-calibration" class="calibration-button">退出舵机校准模式</button>
+          </div>
+          <div class="error" id="config-error"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/nipplejs.min.js"></script>
+  <script>
+    document.addEventListener('dblclick', (e) => e.preventDefault(), { passive: false });
+    document.addEventListener('DOMContentLoaded', () => {
+      // Tab 切换
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.onclick = () => {
+          document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          document.querySelectorAll('.panel').forEach(p => p.style.display = 'none');
+          document.getElementById(tab.dataset.tab).style.display = 'block';
+        };
+      });
+
+      const controlError = document.getElementById('control-error');
+      const actionButtons = document.getElementById('action-buttons');
+      
+      const buttonContainer = document.createElement('div');
+      buttonContainer.className = 'button-container';
+      
+      for (let row = 0; row < 3; row++) {
+        const buttonRow = document.createElement('div');
+        buttonRow.className = 'button-row';
+        for (let i = 1; i <= 4; i++) {
+          const btn = document.createElement('button');
+          const buttonNumber = row * 4 + i;
+          btn.textContent = buttonNumber;
+          btn.onclick = () => sendAction(buttonNumber);
+          buttonRow.appendChild(btn);
+        }
+        buttonContainer.appendChild(buttonRow);
+      }
+      
+      actionButtons.appendChild(buttonContainer);
+
+      async function sendAction(id) {
+        try {
+          const r = await fetch('/control', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: id.toString() }) });
+          if (!r.ok) {
+            if (r.status === 400) {
+              const data = await r.json();
+              if (data.error === "Control disabled in calibration mode") {
+                controlError.innerHTML = '校准模式下无法使用控制功能<br />请尝试到舵机校准页面重新退出校准模式';
+              } else {
+                controlError.textContent = '连接错误';
+              }
+            } else {
+              controlError.textContent = '连接错误';
+            }
+          } else {
+            controlError.textContent = '';
+          }
+        } catch (_) {
+          controlError.textContent = '连接错误';
+        }
+      }
+
+      // 摇杆
+      const joystickZone = document.getElementById('joystick');
+      const manager = nipplejs.create({ 
+        zone: joystickZone, 
+        size: 120,
+        mode: 'dynamic',
+        position: { left: '50%', top: '50%' },
+        color: '#00BFFF',
+      });
+      let lastDir = null;
+      let interval = null;
+      const DISTANCE_THRESHOLD = 0.2; // 距离阈值，小于此值不发送
+      const SEND_INTERVAL = 500; // 发送间隔，单位毫秒
+
+      manager.on('start move end', (evt, data) => {
+        if (evt.type === 'end') {
+          clearInterval(interval);
+          lastDir = null;
+          return;
+        }
+
+        if (data.force < DISTANCE_THRESHOLD) {
+          clearInterval(interval);
+          lastDir = null;
+          return;
+        }
+
+        const angle = data.angle && data.angle.radian;
+        if (angle === undefined) return;
+
+        const degrees = (angle * 180 / Math.PI + 360) % 360;
+        
+        let dir = null;
+        if (degrees >= 45 && degrees < 135) dir = 'F';
+        else if (degrees >= 135 && degrees < 225) dir = 'L';
+        else if (degrees >= 225 && degrees < 315) dir = 'B';
+        else dir = 'R';
+
+        if (dir) {
+          if (dir !== lastDir) {
+            lastDir = dir;
+            clearInterval(interval);
+            sendMove(dir);
+            interval = setInterval(() => sendMove(dir), SEND_INTERVAL);
+          }
+        }
+      });
+      async function sendMove(m) {
+        try {
+          const r = await fetch('/control', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ move: m }) });
+          if (!r.ok) {
+            if (r.status === 400) {
+              const data = await r.json();
+              if (data.error === "Control disabled in calibration mode") {
+                controlError.innerHTML = '校准模式下无法使用控制功能<br />请尝试到舵机校准页面重新退出校准模式';
+              } else {
+                controlError.textContent = '连接错误';
+              }
+            } else {
+              controlError.textContent = '连接错误';
+            }
+          } else {
+            controlError.textContent = '';
+          }
+        } catch (_) {
+          controlError.textContent = '连接错误';
+        }
+      }
+
+      // 配置 Tab
+      const configError = document.getElementById('config-error');
+      let cfg = { fl: 0, fr: 0, bl: 0, br: 0 };
+      let current = null;
+      const display = document.getElementById('value-display');
+      const minus = document.getElementById('minus');
+      const plus = document.getElementById('plus');
+      const calibrationIntro = document.getElementById('calibration-intro');
+      const calibrationInterface = document.getElementById('calibration-interface');
+      const startCalibrationBtn = document.getElementById('start-calibration');
+      const exitCalibrationBtn = document.getElementById('exit-calibration');
+
+      startCalibrationBtn.onclick = () => {
+        fetch('/start_calibration')
+          .then(async r => {
+            if (!r.ok) {
+              const data = await r.json();
+              if (data.error) {
+                throw new Error(data.error);
+              }
+              throw new Error('设备错误');
+            }
+            const data = await r.json();
+            if (!data || typeof data !== 'object' || 
+                typeof data.fl !== 'number' || 
+                typeof data.fr !== 'number' || 
+                typeof data.bl !== 'number' || 
+                typeof data.br !== 'number') {
+              throw new Error('响应异常');
+            }
+            cfg = data;
+            // 更新显示
+            Object.entries(cfg).forEach(([pos, value]) => {
+              document.querySelector(`.servo[data-pos='${pos}'] .value`).textContent = value;
+            });
+            calibrationIntro.style.display = 'none';
+            calibrationInterface.style.display = 'block';
+          })
+          .catch(e => {
+            configError.textContent = e.message || '网络错误';
+          });
+      };
+
+      exitCalibrationBtn.onclick = () => {
+        fetch('/exit_calibration')
+          .then(r => {
+            if (!r.ok) throw new Error();
+            calibrationInterface.style.display = 'none';
+            calibrationIntro.style.display = 'block';
+          })
+          .catch(_ => configError.textContent = '连接错误');
+      };
+
+      document.querySelectorAll('.servo').forEach(s => {
+        s.onclick = () => {
+          document.querySelectorAll('.servo').forEach(x => x.classList.remove('active'));
+          s.classList.add('active');
+          current = s.dataset.pos;
+          display.textContent = cfg[current];
+          document.querySelector('.adjust').style.display = 'flex';
+        };
+      });
+
+      document.querySelector('.vehicle').addEventListener('click', (e) => {
+        if (e.target.classList.contains('vehicle')) {
+          document.querySelectorAll('.servo').forEach(x => x.classList.remove('active'));
+          current = null;
+          document.querySelector('.adjust').style.display = 'none';
+        }
+      });
+
+      minus.onclick = () => adjust(-1);
+      plus.onclick = () => adjust(1);
+      function adjust(d) {
+        if (!current) return;
+        const newValue = cfg[current] + d;
+        if (newValue >= -25 && newValue <= 25) {
+          cfg[current] = newValue;
+        } else if (newValue < -25) {
+          cfg[current] = -25;
+        } else if (newValue > 25) {
+          cfg[current] = 25;
+        }
+        document.querySelector(`.servo[data-pos='${current}'] .value`).textContent = cfg[current];
+        display.textContent = cfg[current];
+        fetch('/adjust', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ servo: current, value: cfg[current] })
+        }).catch(_ => configError.textContent = '连接错误');
+      }
+    });
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,8 @@
+description: BSP Display example
+
+dependencies:
+
+  espressif/esp_lv_decoder: "^0.1.2"
+  espressif/esp_lv_fs: "^1.0.0"
+  espressif/esp_mmap_assets: "*"
+  espressif/button: "*"

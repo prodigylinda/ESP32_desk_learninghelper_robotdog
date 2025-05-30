@@ -1,0 +1,13 @@
+description: BSP Display example
+
+dependencies:
+  # esp32_c3_lcdkit:
+  #   version: "*"
+  #   override_path: "../../../bsp/esp32_c3_lcdkit"
+
+  espressif/esp_lv_decoder: ^0.1.2
+  espressif/esp_lv_fs: ^1.0.0
+  espressif/esp_mmap_assets: '*'
+  espressif/button: '*'
+  espressif/led_strip: ^2.4.1
+  espressif/esp-sr: ^2.1.3

@@ -1,0 +1,29 @@
+menu "Servo Dog Configuration"
+
+    menu "Servo Neutral Angle Configuration"
+        config FL_ANGLE_NEUTRAL
+            int "Front Left Servo Neutral Angle"
+            default 70
+            help
+            Neutral angle value for the Front Left Servo.
+
+        config FR_ANGLE_NEUTRAL
+            int "Front Right Servo Neutral Angle"
+            default 110
+            help
+            Neutral angle value for the Front Right Servo.
+
+        config BL_ANGLE_NEUTRAL
+            int "Back Left Servo Neutral Angle"
+            default 110
+            help
+            Neutral angle value for the Back Left Servo.
+
+        config BR_ANGLE_NEUTRAL
+            int "Back Right Servo Neutral Angle"
+            default 70
+            help
+            Neutral angle value for the Back Right Servo.
+    endmenu
+
+endmenu
