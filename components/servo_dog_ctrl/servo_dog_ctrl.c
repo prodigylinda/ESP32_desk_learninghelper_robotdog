@@ -11,12 +11,16 @@
 #include "esp_check.h"
 #include "string.h"
 #include "esp_err.h"
+#include "driver/gpio.h"
 #include "iot_servo.h"
 #include "servo_dog_ctrl.h"
 
 static const char *TAG = "servo_dog_ctrl";
 
 #define BOW_OFFSET                  50  //Front lying /backward offset angle
+
+// Forward declaration
+static void servo_dog_ledc_stop(void);
 
 #define STEP_OFFSET                 5
 
@@ -66,6 +70,10 @@ typedef struct {
     QueueHandle_t dog_action_queue;
     servo_dog_action_msg_t msg;
     servo_dog_state_t state;
+    gpio_num_t fl_gpio_num;
+    gpio_num_t fr_gpio_num;
+    gpio_num_t bl_gpio_num;
+    gpio_num_t br_gpio_num;
 } servor_dog_ctrl_t;
 
 static servor_dog_ctrl_t *g_servo_dog = NULL;
@@ -104,6 +112,7 @@ static void servo_dog_installation(dog_action_args_t args) {
     servo_set_angle(SERVO_BL, bl_angle_neutral + 70);
     servo_set_angle(SERVO_BR, br_angle_neutral - 70);
     vTaskDelay(200 / portTICK_PERIOD_MS);
+    servo_dog_ledc_stop();
 }
 
 static void servo_dog_forward(dog_action_args_t args)
@@ -598,6 +607,13 @@ static void servo_dog_ledc_stop(void)
     for (int ch = LEDC_CHANNEL_0; ch <= LEDC_CHANNEL_3; ch++) {
         ledc_stop(LEDC_LOW_SPEED_MODE, ch, 1);
     }
+
+    if (g_servo_dog != NULL) {
+        gpio_set_level(g_servo_dog->fl_gpio_num, 1);
+        gpio_set_level(g_servo_dog->fr_gpio_num, 1);
+        gpio_set_level(g_servo_dog->bl_gpio_num, 1);
+        gpio_set_level(g_servo_dog->br_gpio_num, 1);
+    }
 }
 
 #define X(state, func, repeat, speed, hold, angle_offset) [state] = {.funcion = func, .args = {repeat, speed, hold, angle_offset}},
@@ -668,6 +684,12 @@ esp_err_t servo_dog_ctrl_init(servo_dog_ctrl_config_t *config)
     ESP_RETURN_ON_FALSE(g_servo_dog != NULL, ESP_ERR_NO_MEM, TAG, "Failed to allocate memory for servo dog control");
     g_servo_dog->dog_action_queue = xQueueCreate(5, sizeof(servo_dog_action_msg_t));
     ESP_GOTO_ON_FALSE(g_servo_dog->dog_action_queue != NULL, ESP_ERR_NO_MEM, err, TAG, "Failed to create dog action queue");
+
+    g_servo_dog->fl_gpio_num = config->fl_gpio_num;
+    g_servo_dog->fr_gpio_num = config->fr_gpio_num;
+    g_servo_dog->bl_gpio_num = config->bl_gpio_num;
+    g_servo_dog->br_gpio_num = config->br_gpio_num;
+    
     // Create servo_dog_ctrl_task
     servo_init(config);
     xTaskCreate(servo_dog_ctrl_task, "servo_dog_ctrl_task", 2048, NULL, 5, NULL);

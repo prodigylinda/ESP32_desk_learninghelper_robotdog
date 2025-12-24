@@ -5,12 +5,16 @@
  */
 #pragma once
 
+#ifdef CONFIG_ESP_HI_WEB_CONTROL_ENABLED
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void app_https_init(void);
+esp_err_t esp_hi_web_control_server_init(void);
 
 #ifdef __cplusplus
 }
 #endif
+
+#endif // CONFIG_ESP_HI_WEB_CONTROL_ENABLED

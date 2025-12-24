@@ -8,8 +8,8 @@
 #include <string.h>
 #include "esp_log.h"
 #include "esp_http_server.h"
-#include "esp_spiffs.h"
-#include "app_servo_control.h"
+#include "esp_hi_web_control.h"
+#include "servo_control_setting.h"
 #include "servo_dog_ctrl.h"
 #include "mdns.h"
 
@@ -20,7 +20,18 @@ static bool is_calibration_mode = false;
 #define IS_FILE_EXT(filename, ext) \
     (strcasecmp(&filename[strlen(filename) - sizeof(ext) + 1], ext) == 0)
 
-#define STATIC_PATH "/spiffs"
+extern const uint8_t index_html_start[] asm("_binary_index_html_start");
+extern const uint8_t index_html_end[] asm("_binary_index_html_end");
+extern const uint8_t favicon_ico_start[] asm("_binary_favicon_ico_start");
+extern const uint8_t favicon_ico_end[] asm("_binary_favicon_ico_end");
+extern const uint8_t calibration_png_start[] asm("_binary_calibration_png_start");
+extern const uint8_t calibration_png_end[] asm("_binary_calibration_png_end");
+extern const uint8_t nipplejs_min_js_start[] asm("_binary_nipplejs_min_js_start");
+extern const uint8_t nipplejs_min_js_end[] asm("_binary_nipplejs_min_js_end");
+extern const uint8_t styles_css_start[] asm("_binary_styles_css_start");
+extern const uint8_t styles_css_end[] asm("_binary_styles_css_end");
+extern const uint8_t main_js_start[] asm("_binary_main_js_start");
+extern const uint8_t main_js_end[] asm("_binary_main_js_end");
 
 /* Set HTTP response content type according to file extension */
 static esp_err_t set_content_type_from_file(httpd_req_t *req, const char *filename)
@@ -46,37 +57,42 @@ static esp_err_t set_content_type_from_file(httpd_req_t *req, const char *filena
 static esp_err_t static_file_handler(httpd_req_t *req)
 {
     const char *uri = req->uri;
-    char filepath[1024];
+    const uint8_t *file_start = NULL;
+    const uint8_t *file_end = NULL;
+    size_t file_size = 0;
 
     if (strcmp(uri, "/") == 0) {
         uri = "/index.html";
     }
-    snprintf(filepath, sizeof(filepath), "/spiffs%s", uri);
-    ESP_LOGI(TAG, "filepath: %s", filepath);
-    FILE *file = fopen(filepath, "r");
 
-    if (!file) {
-        ESP_LOGE(TAG, "File not found: %s", filepath);
+    if (strcmp(uri, "/index.html") == 0) {
+        file_start = index_html_start;
+        file_end = index_html_end;
+    } else if (strcmp(uri, "/favicon.ico") == 0) {
+        file_start = favicon_ico_start;
+        file_end = favicon_ico_end;
+    } else if (strcmp(uri, "/calibration.png") == 0) {
+        file_start = calibration_png_start;
+        file_end = calibration_png_end;
+    } else if (strcmp(uri, "/nipplejs.min.js") == 0) {
+        file_start = nipplejs_min_js_start;
+        file_end = nipplejs_min_js_end;
+    } else if (strcmp(uri, "/styles.css") == 0) {
+        file_start = styles_css_start;
+        file_end = styles_css_end;
+    } else if (strcmp(uri, "/main.js") == 0) {
+        file_start = main_js_start;
+        file_end = main_js_end;
+    } else {
+        ESP_LOGE(TAG, "File not found: %s", uri);
         httpd_resp_send_404(req);
         return ESP_FAIL;
     }
 
-    set_content_type_from_file(req, filepath);
+    file_size = file_end - file_start;
+    set_content_type_from_file(req, uri);
 
-    char buffer[1024];
-    size_t read_bytes;
-    while ((read_bytes = fread(buffer, 1, sizeof(buffer), file)) > 0) {
-        httpd_resp_send_chunk(req, buffer, read_bytes);
-    }
-    fclose(file);
-    httpd_resp_send_chunk(req, NULL, 0);
-    return ESP_OK;
-}
-
-// API: GET /api/404
-static esp_err_t get_404_handler(httpd_req_t *req)
-{
-    httpd_resp_send_404(req);
+    httpd_resp_send(req, (const char *)file_start, file_size);
     return ESP_OK;
 }
 
@@ -259,7 +275,7 @@ void start_mdns_service(void) {
         ESP_LOGE(TAG, "MDNS init failed");
         return;
     }
-    err = mdns_hostname_set(CONFIG_ESP_MDNS_HOSTNAME);
+    err = mdns_hostname_set(CONFIG_ESP_HI_MDNS_HOSTNAME);
     if (err != ESP_OK) {
         ESP_LOGE(TAG, "MDNS hostname set failed");
         return;
@@ -282,17 +298,13 @@ void start_mdns_service(void) {
     ESP_LOGI(TAG, "MDNS service started");
 }
 
-void app_https_init(void)
+esp_err_t esp_hi_web_control_server_init(void)
 {
-    esp_vfs_spiffs_conf_t conf = {
-        .base_path = STATIC_PATH,
-        .partition_label = "storage",
-        .max_files = 5,   // This decides the maximum number of files that can be created on the storage
-        .format_if_mount_failed = false
-    };
-
+    servo_control_init();
     start_mdns_service();
-
-    ESP_ERROR_CHECK(esp_vfs_spiffs_register(&conf));
-    ESP_ERROR_CHECK(start_webserver());
+    esp_err_t err = start_webserver();
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "Web server start failed");
+    }
+    return(err);
 }
