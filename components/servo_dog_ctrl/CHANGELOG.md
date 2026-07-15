@@ -1,5 +1,12 @@
 # ChangeLog
 
+## v0.2.0 - 2026-07-15
+
+* Add ESP-IDF 6 compatibility
+* Upgrade `espressif/servo` dependency to `^1.0.0`
+* Migrate servo control implementation to the new `servo_handle_t` API
+* Add explicit GPIO and LEDC driver component dependencies
+
 ## v0.1.9 - 2025-12-24
 
 * Update `idf_component.yml`

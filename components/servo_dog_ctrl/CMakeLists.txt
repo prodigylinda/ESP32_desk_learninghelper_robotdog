@@ -1,5 +1,5 @@
 set(SRCS "servo_dog_ctrl.c")
-set(PRIV_REQUIRES "esp_driver_ledc")
+set(REQUIRES "esp_driver_gpio" "esp_driver_ledc")
 set(EMBED_FILES "")
 
 if(CONFIG_ESP_HI_WEB_CONTROL_ENABLED)
@@ -15,5 +15,6 @@ endif()
 idf_component_register(SRCS ${SRCS}
                     INCLUDE_DIRS "include"
                     PRIV_INCLUDE_DIRS "priv_include"
+                    REQUIRES ${REQUIRES}
                     PRIV_REQUIRES "esp_http_server" "nvs_flash"
                     EMBED_FILES ${EMBED_FILES})

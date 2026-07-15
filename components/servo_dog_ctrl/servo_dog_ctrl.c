@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2024-2025 Espressif Systems (Shanghai) CO LTD
+ * SPDX-FileCopyrightText: 2024-2026 Espressif Systems (Shanghai) CO LTD
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -70,6 +70,7 @@ typedef struct {
     QueueHandle_t dog_action_queue;
     servo_dog_action_msg_t msg;
     servo_dog_state_t state;
+    servo_handle_t servos[4];
     gpio_num_t fl_gpio_num;
     gpio_num_t fr_gpio_num;
     gpio_num_t bl_gpio_num;
@@ -93,7 +94,9 @@ void servo_dog_set_leg_offset(int8_t fl_offset, int8_t bl_offset, int8_t fr_offs
 
 static void servo_set_angle(servo_id_t servo_id, uint16_t angle)
 {
-    iot_servo_write_angle(LEDC_LOW_SPEED_MODE, servo_id, angle);
+    if (g_servo_dog != NULL && g_servo_dog->servos[servo_id] != NULL) {
+        iot_servo_write_angle(g_servo_dog->servos[servo_id], angle);
+    }
 }
 
 static void servo_dog_neutral(dog_action_args_t args)
@@ -643,36 +646,29 @@ static void servo_dog_ctrl_task(void *arg)
     ESP_LOGI(TAG, "Servo Test Task Deleted");
 }
 
-static void servo_init(servo_dog_ctrl_config_t *config)
+static esp_err_t servo_init(servo_dog_ctrl_config_t *config)
 {
     ESP_LOGD(TAG, "Servo Control LEDC Channel init");
 
-    // Configure the server
-    servo_config_t servo_cfg = {
-        .max_angle = 180,
-        .min_width_us = 500,
-        .max_width_us = 2500,
-        .freq = 50,
-        .timer_number = LEDC_TIMER_0,
-        .channels = {
-            .servo_pin = {
-                config->fl_gpio_num,
-                config->fr_gpio_num,
-                config->bl_gpio_num,
-                config->br_gpio_num,
-            },
-            .ch = {
-                LEDC_CHANNEL_0,
-                LEDC_CHANNEL_1,
-                LEDC_CHANNEL_2,
-                LEDC_CHANNEL_3,
-            },
-        },
-        .channel_number = 4,
+    const gpio_num_t servo_pins[] = {
+        config->fl_gpio_num,
+        config->fr_gpio_num,
+        config->bl_gpio_num,
+        config->br_gpio_num,
+    };
+    const ledc_channel_t servo_channels[] = {
+        LEDC_CHANNEL_0,
+        LEDC_CHANNEL_1,
+        LEDC_CHANNEL_2,
+        LEDC_CHANNEL_3,
     };
 
-    // Initialize the server
-    iot_servo_init(LEDC_LOW_SPEED_MODE, &servo_cfg);
+    for (int i = 0; i < 4; i++) {
+        servo_config_t servo_cfg = SERVO_CONFIG_DEFAULT(LEDC_LOW_SPEED_MODE, LEDC_TIMER_0, servo_channels[i], servo_pins[i]);
+        ESP_RETURN_ON_ERROR(iot_servo_new(&servo_cfg, &g_servo_dog->servos[i]), TAG, "Failed to create servo %d", i);
+    }
+
+    return ESP_OK;
 }
 
 esp_err_t servo_dog_ctrl_init(servo_dog_ctrl_config_t *config)
@@ -691,10 +687,17 @@ esp_err_t servo_dog_ctrl_init(servo_dog_ctrl_config_t *config)
     g_servo_dog->br_gpio_num = config->br_gpio_num;
     
     // Create servo_dog_ctrl_task
-    servo_init(config);
+    ESP_GOTO_ON_ERROR(servo_init(config), err, TAG, "Failed to initialize servos");
     xTaskCreate(servo_dog_ctrl_task, "servo_dog_ctrl_task", 2048, NULL, 5, NULL);
     return ESP_OK;
 err:
+    if (g_servo_dog != NULL) {
+        for (int i = 0; i < 4; i++) {
+            if (g_servo_dog->servos[i] != NULL) {
+                iot_servo_del(g_servo_dog->servos[i]);
+            }
+        }
+    }
     if (g_servo_dog->dog_action_queue != NULL) {
         vQueueDelete(g_servo_dog->dog_action_queue);
     }

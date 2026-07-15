@@ -46,7 +46,7 @@ menu "Servo Dog WiFi Configuration"
         default 5
         help
         Set the Maximum retry to avoid station reconnecting to the softAP unlimited when the softAP is really inexistent.
-    
+
     choice
         prompt "Language"
         default LANGUAGE_ZH_CN

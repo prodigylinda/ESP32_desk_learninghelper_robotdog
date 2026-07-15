@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2024-2025 Espressif Systems (Shanghai) CO LTD
+ * SPDX-FileCopyrightText: 2024-2026 Espressif Systems (Shanghai) CO LTD
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -7,6 +7,7 @@
 #pragma once
 
 #include "esp_err.h"
+#include "driver/gpio.h"
 #include "driver/ledc.h"
 
 #ifdef __cplusplus
@@ -119,4 +120,3 @@ void servo_dog_set_leg_offset(int8_t fl_offset, int8_t bl_offset, int8_t fr_offs
 #ifdef __cplusplus
 }
 #endif
-

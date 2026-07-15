@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2024-2025 Espressif Systems (Shanghai) CO LTD
+ * SPDX-FileCopyrightText: 2024-2026 Espressif Systems (Shanghai) CO LTD
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -126,7 +126,13 @@ static esp_err_t adjust_handler_func(httpd_req_t *req)
 {
     ESP_LOGI(TAG, "Adjust request received");
     char content[128] = {0};
-    int ret = httpd_req_recv(req, content, sizeof(content));
+    int ret = httpd_req_recv(req, content, sizeof(content) - 1);
+    if (ret <= 0) {
+        ESP_LOGE(TAG, "Failed to receive adjust request body");
+        httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Failed to receive request body");
+        return ESP_FAIL;
+    }
+    content[ret] = '\0';
     ESP_LOGI(TAG, "Content: %s", content);
     char leg_str[16] = {0};
     int leg_value = 0;
@@ -167,7 +173,13 @@ static esp_err_t control_handler_func(httpd_req_t *req)
 
     ESP_LOGI(TAG, "Control request received");
     char content[128] = {0};
-    int ret = httpd_req_recv(req, content, sizeof(content));
+    int ret = httpd_req_recv(req, content, sizeof(content) - 1);
+    if (ret <= 0) {
+        ESP_LOGE(TAG, "Failed to receive control request body");
+        httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Failed to receive request body");
+        return ESP_FAIL;
+    }
+    content[ret] = '\0';
     ESP_LOGI(TAG, "Content: %s", content);
 
     char function[16];

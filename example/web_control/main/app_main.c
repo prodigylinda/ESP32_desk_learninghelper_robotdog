@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2025 Espressif Systems (Shanghai) CO LTD
+ * SPDX-FileCopyrightText: 2025-2026 Espressif Systems (Shanghai) CO LTD
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -24,6 +24,7 @@ void app_main(void)
     }
     ESP_ERROR_CHECK(ret);
 
+    ESP_LOGI(TAG, "Initializing servo dog controller");
     servo_dog_ctrl_config_t config = {
         .fl_gpio_num = 21,
         .fr_gpio_num = 19,
