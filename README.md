@@ -4,6 +4,10 @@ An **education-oriented customization of an ESPHi-based ESP32 desktop robot**, d
 
 This project is built directly upon the original **ESPHi open-source project**. The underlying firmware architecture and core implementation are retained from the upstream project, while this version focuses on **educational content, voice customization, and physical design modifications**.
 
+![ESP32 DeskDog](侧showing.jpg)
+![ESP32 DeskDog_Screen](正showing.jpg)
+![ESP32 DeskDog_box](上showing.jpg)
+
 ---
 
 
