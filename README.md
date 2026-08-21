@@ -13,28 +13,28 @@ One of the primary purposes of this version is to transform the robot into a mor
 
 The knowledge content has been expanded to cover the major subjects of the Chinese high-school curriculum, including both **compulsory and elective materials**:
 * **Mathematics**
-  *Compulsory courses
-  *Elective courses
-  *Core high-school mathematics topics
+  * Compulsory courses
+  * Elective courses
+  * Core high-school mathematics topics
 
 * **English**
-  *High-school English curriculum
-  *Vocabulary and language-related content
+  * High-school English curriculum
+  * Vocabulary and language-related content
 
 * **Physics**
-  *Compulsory courses
-  *Elective courses
-  *Core physics concepts and principles
+  * Compulsory courses
+  * Elective courses
+  * Core physics concepts and principles
   
 * **Chemistry**
-  *Compulsory courses
-  *Elective courses
-  *Fundamental chemistry concepts
+  * Compulsory courses
+  * Elective courses
+  * Fundamental chemistry concepts
   
 * **Biology**
-  *Compulsory courses
-  *Elective courses
-  *Fundamental biology concepts
+  * Compulsory courses
+  * Elective courses
+  * Fundamental biology concepts
   
 The expanded content is intended to support **subject-based question answering, concept review, learning assistance, and general academic interaction**.
 
