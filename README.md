@@ -12,31 +12,30 @@ This project is built directly upon the original **ESPHi open-source project**. 
 One of the primary purposes of this version is to transform the robot into a more education-oriented AI companion.
 
 The knowledge content has been expanded to cover the major subjects of the Chinese high-school curriculum, including both **compulsory and elective materials**:
-
 * **Mathematics**
-  * Compulsory courses
-  * Elective courses
-  * Core high-school mathematics topics
+  Compulsory courses
+  Elective courses
+  Core high-school mathematics topics
 
 * **English**
-  * High-school English curriculum
-  * Vocabulary and language-related content
+  High-school English curriculum
+  Vocabulary and language-related content
 
 * **Physics**
-  * Compulsory courses
-  * Elective courses
-  * Core physics concepts and principles
-
+  Compulsory courses
+  Elective courses
+  Core physics concepts and principles
+  
 * **Chemistry**
-  * Compulsory courses
-  * Elective courses
-  * Fundamental chemistry concepts
-
+  Compulsory courses
+  Elective courses
+  Fundamental chemistry concepts
+  
 * **Biology**
-  * Compulsory courses
-  * Elective courses
-  * Fundamental biology concepts
-
+  Compulsory courses
+  Elective courses
+  Fundamental biology concepts
+  
 The expanded content is intended to support **subject-based question answering, concept review, learning assistance, and general academic interaction**.
 
 ---
@@ -98,7 +97,7 @@ The customized physical design includes a rear-mounted white storage module.
 The module was designed to remain simple while giving the robot a more recognizable visual identity.
 
 ---
-## ⚖️ Attribution & Credits
+## Attribution & Credits
 
 This project is a customized derivative of the original **ESPHi** project.
 
@@ -129,14 +128,14 @@ For the original source code, project documentation, contributors, and licensing
 
 ---
 
-## 📜 License
+## License
 This repository follows the licensing requirements of the original **ESPHi** project.
 Because the core implementation is inherited from the upstream project, users should review the **original repository's license** before redistributing, modifying, or incorporating this code into other projects.
 The custom educational content, voice configuration, and physical modifications presented in this repository should be considered additions to the original project rather than a replacement for its original licensing terms.
 
 ---
 
-## 🚀 Project Direction
+## Project Direction
 
 This project is an exploration of how an embedded AI robot can become more than a conventional voice assistant.
 The current version focuses on education, but the same platform could potentially be extended toward:
@@ -149,7 +148,6 @@ The current version focuses on education, but the same platform could potentiall
 The broader goal is to explore the intersection of **AI, education, robotics, and embedded systems** through a small, physical, and highly customizable device.
 
 ---
-
 ## Credits
 **Base Project:** ESPHi
 **Platform:** ESP32
