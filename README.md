@@ -1,6 +1,6 @@
 # ESP32 Educational Robot
 
-An **education-oriented customization of an ESPHi-based ESP32 desktop robot**, developed with the goal of combining voice interaction, AI, embedded systems, and high-school education into a compact desktop companion.
+An **education-oriented customization of an ESPHi-based ESP32 desktop** robot, developed with the goal of combining voice interaction, AI, embedded systems, and high-school education into a compact desktop companion.
 
 This project is built directly upon the original **ESPHi open-source project**. The underlying firmware architecture and core implementation are retained from the upstream project, while this version focuses on **educational content, voice customization, and physical design modifications**.
 
@@ -38,6 +38,7 @@ The knowledge content has been expanded to cover the major subjects of the Chine
   * Elective courses
   * Fundamental biology concepts
   
+Other subjects can be add later.
 The expanded content is intended to support **subject-based question answering, concept review, learning assistance, and general academic interaction**.
 
 ---
