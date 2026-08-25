@@ -45,7 +45,6 @@ The expanded content is intended to support **subject-based question answering, 
 ## Rear Storage Module
 
 A small **white storage box** has been added to the back of the robot as part of the physical customization.
-
 The module is intentionally simple and currently has **no fixed electronic or mechanical function**.
 
 Its main purposes are:
