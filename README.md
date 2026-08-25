@@ -53,6 +53,7 @@ Its main purposes are:
 * Improving the overall visual design of the robot
 
 For example, it can hold:
+
 * Erasers
 * Nintendo Switch game cards
 * Other small lightweight desktop items
