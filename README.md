@@ -6,7 +6,6 @@ This project is built directly upon the original **ESPHi open-source project**. 
 
 
 Pratical pictures can be seen in the SHOW folder after clone
-
 ---
 
 ### Comprehensive High-School Educational Content
