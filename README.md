@@ -8,8 +8,10 @@ Pratical pictures can be seen in the SHOW folder after clone
 
 ---
 
+
 ### Comprehensive High-School Educational Content
 One of the primary purposes of this version is to transform the robot into a more education-oriented AI companion.
+
 
 The knowledge content has been expanded to cover the major subjects of the Chinese high-school curriculum, including both **compulsory and elective materials**:
 * **Mathematics**
