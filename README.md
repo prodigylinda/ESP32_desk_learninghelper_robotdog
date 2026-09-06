@@ -3,7 +3,6 @@
 An **education-oriented customization of an ESPHi-based ESP32 desktop** robot, developed with the goal of combining voice interaction, AI, embedded systems, and high-school education into a compact desktop companion.
 
 This project is built directly upon the original **ESPHi open-source project**. The underlying firmware architecture and core implementation are retained from the upstream project, while this version focuses on **educational content, voice customization, and physical design modifications**.
-
 Pratical pictures can be seen in the SHOW folder after clone
 
 ---
