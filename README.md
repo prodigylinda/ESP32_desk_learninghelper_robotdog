@@ -7,7 +7,6 @@ Pratical pictures can be seen in the SHOW folder after clone
 
 ---
 
-
 ### Comprehensive High-School Educational Content
 One of the primary purposes of this version is to transform the robot into a more education-oriented AI companion.
 
